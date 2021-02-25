@@ -1,0 +1,15 @@
+name = "TseirServer"
+uuid = "a32ec2c1-f0ab-48c4-b315-ec765521959c"
+authors = ["gzagatti <gzagatti@users.noreply.github.com>"]
+version = "0.1.0"
+
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+Genie = "c43c736e-a2d1-11e8-161f-af95117fbd1e"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+LibPQ = "194296ae-ab2e-5f79-8cd4-7183a0a5a0d1"
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+LoggingExtras = "e6f89c97-d47a-5376-807f-9c37f3926c36"
+MbedTLS = "739be429-bea8-5141-9913-cc70e7f3736d"
+Tseir = "4f6b9050-0f4b-40cc-ab86-f9e0d0f9d775"
