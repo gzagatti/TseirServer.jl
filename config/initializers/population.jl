@@ -1,4 +1,4 @@
-const population = @async begin
+const population = @task begin
     conn = LibPQ.Connection(dbpath)
     transition_stmt = LibPQ.prepare(
         conn, """
