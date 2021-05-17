@@ -22,8 +22,8 @@ RUN julia -e "using Pkg; Pkg.activate(\".\"); Pkg.instantiate(); Pkg.precompile(
 EXPOSE 8000
 
 ENV JULIA_DEPOT_PATH "/home/genie/.julia"
-ENV GENIE_ENV "dev"
-ENV HOST "127.0.0.1"
+ENV GENIE_ENV "prod"
+ENV HOST "0.0.0.0"
 ENV PORT "8000"
 
 CMD ["bin/server"]
