@@ -10,42 +10,51 @@ using Tseir
 using HTTP
 using DelimitedFiles
 
-mutable struct ConnectionPool
+mutable struct ConnectionPool{T}
 
+  dbpath::String
   N::Int
-  in_use::Set{Int}
-  available::Set{Int}
-  pool::Vector{LibPQ.Connection}
-
-  function ConnectionPool(N::Int)
-    return new(N, Set{Int}(), Set{Int}(), Vector{LibPQ.Connection}())
-  end
+  in_use::Dict{Int, T}
+  available::Dict{Int, T}
 
 end
+
+struct Connection
+
+  conn::LibPQ.Connection
+  pool::ConnectionPool
+  id::Int
+
+end
+
+function ConnectionPool(dbpath::String, N::Int)
+  return ConnectionPool{Connection}(dbpath, N, Dict{Int, Connection}(), Dict{Int, Connection}())
+end
+
 
 function get_conn!(pool::ConnectionPool)
-  conn = nothing
-  conn_id = nothing
   if length(pool.in_use) < pool.N
     if length(pool.available) > 0
-      conn_id = pop!(pool.available)
-      push!(pool.in_use, conn_id)
-      conn = pool.pool[conn_id]
+      id = collect(keys(pool.available))[1]
+      conn = pop!(pool.available, id)
+      pool.in_use[id] = conn
     else
-      conn = LibPQ.Connection(TseirServer.dbpath)
-      conn_id = length(pool.pool) + 1
-      push!(pool.pool, conn)
-      push!(pool.in_use, conn_id)
+      id = length(pool.in_use) + 1
+      conn = Connection(LibPQ.Connection(pool.dbpath), pool, id)
+      pool.in_use[conn.id] = conn
     end
+    return conn
+  else
+    throw(error("No connection available."))
   end
-  return conn, conn_id
 end
 
-function return_conn!(pool::ConnectionPool, conn_id)
-  if conn_id in pool.in_use
-    pop!(pool.in_use, conn_id)
+function return_conn!(conn::Connection)
+  pool = conn.pool
+  if haskey(pool.in_use, conn.id)
+    pop!(pool.in_use, conn.id)
   end
-  push!(pool.available, conn_id)
+  pool.available[conn.id] = conn
 end
 
 function main()

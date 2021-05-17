@@ -50,6 +50,7 @@ route("/api/simulator", method = POST) do
     if params_key < 0
       t = @async begin
         Tseir.simulate(params, N, conn.conn, false, TseirServer.population, nothing)
+        TseirServer.return_conn!(conn)
       end
       @info "Simulation triggered, sleeping 180 seconds while waiting for completion."
       timedwait(() -> istaskdone(t), 180.0)
@@ -62,6 +63,7 @@ route("/api/simulator", method = POST) do
           Dict("Content-Type" => "text/plain; charset=utf-8", "Access-Control-Allow-Origin" => "*")
         )
       elseif istaskdone(t)
+        conn = TseirServer.get_conn!(connection_pool)
         params_result = LibPQ.execute(conn.conn, "SELECT key, n, status FROM simulation.params WHERE params = \$1;", (JSON.json(params),))
         if length(params_result) > 0
             if (getindex(params_result, 1, 3) != "error")
@@ -69,7 +71,6 @@ route("/api/simulator", method = POST) do
             end
         end
       else
-        TseirServer.return_conn!(conn)
         @info "Simulation triggered, but not completed within 180 seconds",
         return Genie.Renderer.respond(
           "Simulation triggered, but not completed within 180 seconds",
@@ -109,7 +110,9 @@ route("/api/simulator", method = POST) do
 
   catch
 
-    TseirServer.return_conn!(conn)
+    if !isnothing(conn)
+      TseirServer.return_conn!(conn)
+    end
     @info "Simulation failed."
     return Genie.Renderer.respond(
       "Simulation failed.",
