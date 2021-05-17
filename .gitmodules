@@ -1,0 +1,3 @@
+[submodule "Tseir.jl"]
+	path = Tseir.jl
+	url = git@github.com:gzagatti/Tseir.jl.git
