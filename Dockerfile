@@ -1,4 +1,4 @@
-FROM julia:latest
+FROM julia:1.6
 
 # user
 RUN useradd --create-home --shell /bin/bash genie

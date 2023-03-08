@@ -67,5 +67,6 @@ population = begin
             push!(p, i)
         end
     end
+    @info "Population initialized"
     p
 end
